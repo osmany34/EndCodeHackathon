@@ -1,0 +1,66 @@
+actor StudentManager {
+
+  // Öğrenci Struct'ı
+  public type Student = {
+    name: Text;
+    point: Nat;
+    isActive: Bool;
+  };
+
+  private stable var students: [Student] = [];
+
+  // Yeni bir öğrenci ekleme fonksiyonu
+  public func addStudent(name: Text) : async Text {
+    let newStudent: Student = {
+      name = name;
+      point = 0;
+      isActive = true;
+    };
+    students := Array.append(students, [newStudent]);
+    return "Öğrenci başarıyla eklendi: " # name;
+  };
+
+  // Öğrenci puan ekleme fonksiyonu
+  public func addPoints(name: Text, points: Nat) : async Text {
+    var studentFound = false;
+    students := Array.map<Student, Student>(students, func (student) {
+      if (student.name == name and student.isActive) {
+        studentFound := true;
+        return { student with point = student.point + points };
+      };
+      student
+    });
+    if (studentFound) {
+      return "Puan eklendi: " # name;
+    } else {
+      return "Öğrenci bulunamadı veya inaktif.";
+    };
+  };
+
+  // Öğrenci puan azaltma fonksiyonu
+  public func subtractPoints(name: Text, points: Nat) : async Text {
+    var studentFound = false;
+    students := Array.map<Student, Student>(students, func (student) {
+      if (student.name == name and student.isActive) {
+        studentFound := true;
+        return { student with point = student.point - points };
+      };
+      student
+    });
+    if (studentFound) {
+      return "Puan azaltıldı: " # name;
+    } else {
+      return "Öğrenci bulunamadı veya inaktif.";
+    };
+  };
+
+  // Öğrenci bilgilerini getirme
+  public func getStudentInfo(name: Text) : async ?Student {
+    for (student in students) {
+      if (student.name == name) {
+        return ?student;
+      };
+    };
+    return null;
+  };
+}
